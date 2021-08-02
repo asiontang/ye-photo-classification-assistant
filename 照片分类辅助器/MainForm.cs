@@ -61,6 +61,9 @@ namespace 照片分类辅助器
         {
             Cursor.Current = Cursors.WaitCursor;
 
+            //自动去掉路径里的左右""引号
+            cbbNewFolderName.Text = cbbNewFolderName.Text.Trim().Trim(new[] { '"', ' ' });
+
             //当下拉框里面的是文件夹路径时.执行自动分类功能。
             if (Directory.Exists(cbbNewFolderName.Text))
             {
@@ -81,8 +84,12 @@ namespace 照片分类辅助器
             if (files == null || files.Length == 0)
                 return;
 
-            var newFolderPath = Path.GetDirectoryName(files[0]);
-            newFolderPath = Path.Combine(newFolderPath, dirName);
+            String newFolderPath;
+            //当下拉框里面的是文件夹路径时.自动分类的文件夹都放在这个路径下.
+            if (Directory.Exists(cbbNewFolderName.Text))
+                newFolderPath = Path.Combine(cbbNewFolderName.Text, dirName);
+            else
+                newFolderPath = Path.Combine(Path.GetDirectoryName(files[0]), dirName);
             Directory.CreateDirectory(newFolderPath);
 
             foreach (string file in files)
@@ -95,7 +102,7 @@ namespace 照片分类辅助器
         private void AutoClassify(String path)
         {
             //首先读取该目录下的所有文件
-            var files = new List<string>(Directory.GetFiles(path));
+            var files = new List<string>(Directory.GetFiles(path, "*", SearchOption.AllDirectories));
             files.Sort();
             var dirs = new Dictionary<string, List<string>>();
 
@@ -133,6 +140,20 @@ namespace 照片分类辅助器
                     continue;
                 MoveFiles(dir.Key, dir.Value.ToArray());
             }
+
+            //清理空文件夹
+            var allDir = "";
+            int Count = 0;
+            foreach (var dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+            {
+                if (!Directory.Exists(dir))
+                    continue;
+                if (Directory.GetFiles(dir, "*", SearchOption.AllDirectories).Length > 0)
+                    continue;
+                Directory.Delete(dir, true);
+                allDir += ++Count + ". " + dir + "\r\n";
+            }
+            MessageBox.Show("已删除以下" + Count + "个空文件夹:\r\n\r\n" + allDir);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
