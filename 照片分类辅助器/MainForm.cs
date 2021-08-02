@@ -68,21 +68,27 @@ namespace 照片分类辅助器
         private void btnOK_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
-
-            //自动去掉路径里的左右""引号
-            cbbNewFolderName.Text = cbbNewFolderName.Text.Trim().Trim(new[] { '"', ' ' });
-
-            //当下拉框里面的是文件夹路径时.执行自动分类功能。
-            if (Directory.Exists(cbbNewFolderName.Text))
+            try
             {
-                AutoClassify(cbbNewFolderName.Text);
+                //自动去掉路径里的左右""引号
+                cbbNewFolderName.Text = cbbNewFolderName.Text.Trim().Trim(new[] { '"', ' ' });
+
+                //当下拉框里面的是文件夹路径时.执行自动分类功能。
+                if (Directory.Exists(cbbNewFolderName.Text))
+                {
+                    AutoClassify(cbbNewFolderName.Text);
+                }
+                else
+                {
+                    //添加下拉列表
+                    if (!cbbNewFolderName.Items.Contains(cbbNewFolderName.Text))
+                        cbbNewFolderName.Items.Add(cbbNewFolderName.Text);
+                    MoveFiles(cbbNewFolderName.Text, fileList);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                //添加下拉列表
-                if (!cbbNewFolderName.Items.Contains(cbbNewFolderName.Text))
-                    cbbNewFolderName.Items.Add(cbbNewFolderName.Text);
-                MoveFiles(cbbNewFolderName.Text, fileList);
+                MessageBox.Show(ex.ToString());
             }
             Cursor.Current = Cursors.Default;
         }
@@ -103,6 +109,13 @@ namespace 照片分类辅助器
             foreach (string file in files)
             {
                 var newFilePath = Path.Combine(newFolderPath, Path.GetFileName(file));
+
+                //当文件存在时,自动在文件名后面加1
+                int StepCount = 1;
+                while (File.Exists(newFilePath))
+                {
+                    newFilePath = Path.Combine(newFolderPath, Path.GetFileNameWithoutExtension(file) + "_" + (++StepCount) + Path.GetExtension(file));
+                }
                 File.Move(file, newFilePath);
             }
         }
@@ -120,7 +133,19 @@ namespace 照片分类辅助器
             {
                 var folderName = SpeculateNewFolderName(file);
                 if (string.IsNullOrEmpty(folderName))
+                {
+                    //当文件存在时,自动在文件名后面加1
+                    int StepCount = 1;
+
+                    //将不符合规则的文件,移动到根目录.方便归纳整理.
+                    String newFilePath = Path.Combine(path, Path.GetFileName(file));
+                    while (File.Exists(newFilePath)) 
+                    {
+                        newFilePath = Path.Combine(path, Path.GetFileNameWithoutExtension(file) + "_" + (++StepCount) + Path.GetExtension(file));
+                    }
+                    File.Move(file, newFilePath);
                     continue;
+                }
 
                 if (!dirs.ContainsKey(folderName))
                     dirs.Add(folderName, new List<string>());
@@ -150,15 +175,33 @@ namespace 照片分类辅助器
             }
 
             //清理空文件夹
+            var folders = Directory.GetDirectories(path, "*", SearchOption.AllDirectories);
+            var folderList = new List<string>(folders);
+            folderList.Sort(delegate (string x, string y)
+            {
+                int xSize = x.Length;
+                int ySize = y.Length;
+                if (xSize == ySize)
+                    return 0;
+                if (xSize > ySize)
+                    //将字符串长度长的文件夹排在最前面,这样就会优先将子文件夹先删除,再删除父文件夹.
+                    //否则可能会出现删除父文件夹时,报错提示文件夹不为空的异常.
+                    return -1;
+                else
+                    return 1;
+            });
             var allDir = "";
             int Count = 0;
-            foreach (var dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+
+            foreach (var dir in folderList)
             {
                 if (!Directory.Exists(dir))
                     continue;
+                if (Directory.GetDirectories(dir, "*", SearchOption.AllDirectories).Length > 0)
+                    continue;
                 if (Directory.GetFiles(dir, "*", SearchOption.AllDirectories).Length > 0)
                     continue;
-                Directory.Delete(dir, true);
+                Directory.Delete(dir, false);
                 allDir += ++Count + ". " + dir + "\r\n";
             }
             MessageBox.Show("已删除以下" + Count + "个空文件夹:\r\n\r\n" + allDir);
