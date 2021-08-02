@@ -38,6 +38,14 @@ namespace 照片分类辅助器
             fileList = e.Data.GetData(DataFormats.FileDrop) as string[];
             if (fileList == null || fileList.Length == 0)
                 return;
+            //假如拖进来的是文件夹
+            if (Directory.Exists(fileList[0]))
+            {
+                cbbNewFolderName.Text = fileList[0];
+                return;
+            }
+
+            //当拖进来的是一些零散的文件时.
             var newFolderName = SpeculateNewFolderName(fileList[0]);
             if (string.IsNullOrEmpty(newFolderName))
             {
