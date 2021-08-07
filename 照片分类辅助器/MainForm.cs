@@ -104,11 +104,19 @@ namespace 照片分类辅助器
                 newFolderPath = Path.Combine(cbbNewFolderName.Text, dirName);
             else
                 newFolderPath = Path.Combine(Path.GetDirectoryName(files[0]), dirName);
+
+            //去掉后面的空格:[210801 - ]实际创建的是[210801 -].假如不去掉,比对的新旧文件路径始终会不一致,就会出现多个_2_2了.
+            newFolderPath = newFolderPath.Trim();
+
             Directory.CreateDirectory(newFolderPath);
 
             foreach (string file in files)
             {
                 var newFilePath = Path.Combine(newFolderPath, Path.GetFileName(file));
+
+                //当原地移动时,就忽略掉.否则会出现多次移动文件名多了一堆_2_2_2
+                if (file == newFilePath)
+                    continue;
 
                 //当文件存在时,自动在文件名后面加1
                 int StepCount = 1;
@@ -134,11 +142,15 @@ namespace 照片分类辅助器
                 var folderName = SpeculateNewFolderName(file);
                 if (string.IsNullOrEmpty(folderName))
                 {
-                    //当文件存在时,自动在文件名后面加1
-                    int StepCount = 1;
-
                     //将不符合规则的文件,移动到根目录.方便归纳整理.
                     String newFilePath = Path.Combine(path, Path.GetFileName(file));
+
+                    //当原地移动时,就忽略掉.否则会出现多次移动文件名多了一堆_2_2_2
+                    if (file == newFilePath)
+                        continue;
+
+                    //当文件存在时,自动在文件名后面加1
+                    int StepCount = 1;
                     while (File.Exists(newFilePath)) 
                     {
                         newFilePath = Path.Combine(path, Path.GetFileNameWithoutExtension(file) + "_" + (++StepCount) + Path.GetExtension(file));
