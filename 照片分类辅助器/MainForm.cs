@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace 照片分类辅助器
@@ -18,7 +19,14 @@ namespace 照片分类辅助器
                 return null;
             DateTime dt;
             if (!DateTime.TryParse(fileName.Remove(10), out dt))
-                return null;
+            {
+                //转换时间戳格式的文件名为正常的年月日时间
+                var newFilePath = convertTimestamp(path);
+                if (path == newFilePath)
+                    return null;
+                else
+                    return SpeculateNewFolderName(newFilePath);
+            }
             return dt.ToString("yyMMdd") + " - ";
         }
 
@@ -118,6 +126,8 @@ namespace 照片分类辅助器
                 if (file == newFilePath)
                     continue;
 
+                newFilePath = convertTimestamp(newFilePath);
+
                 //当文件存在时,自动在文件名后面加1
                 int StepCount = 1;
                 while (File.Exists(newFilePath))
@@ -126,6 +136,52 @@ namespace 照片分类辅助器
                 }
                 File.Move(file, newFilePath);
             }
+        }
+        /// <summary>
+        /// 检测文件名里是否有时间戳,返回正常年月日格式的新文件名
+        /// </summary>
+        /// <param name="oldFile"></param>
+        /// <returns>没有时间戳时,返回原文件名</returns>
+        private string convertTimestamp(string oldFile)
+        {
+            //检测文件名中是否携带这UNIX时间戳
+            var oldFileName = Path.GetFileNameWithoutExtension(oldFile);
+            String timestamp = null;
+            {
+                //检测是否是13位数的带了毫秒位数的时间戳(无则增加毫秒位)
+                var match = Regex.Match(oldFileName, "(\\d{13})");
+                if (match.Success)
+                    timestamp = match.Value;
+                else
+                {
+                    match = Regex.Match(oldFileName, "(\\d{10})");
+                    if (match.Success)
+                        timestamp = match.Value + "000";
+                }
+                if (String.IsNullOrEmpty(timestamp))
+                    return oldFile;
+            }
+
+            //将时间戳转换为指定时间格式字符串
+            var start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var dateTimeResult = start.AddMilliseconds(long.Parse(timestamp)).ToLocalTime();
+
+            //不能大于当前时间,一般整理的文件都是历史的,过去的.不会是未来的.
+            if (dateTimeResult.CompareTo(DateTime.Now) > 0)
+                return oldFile;
+
+            //不能小于2010年前的日志,历史太久远,理应不会整理那么老的文件.
+            if (dateTimeResult.CompareTo(new DateTime(2010, 1, 1, 0, 0, 0, DateTimeKind.Local)) < 0)
+                return oldFile;
+           
+            //当原文件名已经包含指定的前缀,为了防止重复.
+            if (oldFileName.StartsWith(dateTimeResult.ToString("yyyy-MM-dd")))
+                return oldFile;
+
+            //转换为新文件名
+            var newFileName = string.Format("{0} {1}{2}", dateTimeResult.ToString("yyyy-MM-dd HHmmss"), oldFileName, Path.GetExtension(oldFile));
+            var newFile = Path.Combine(Path.GetDirectoryName(oldFile), newFileName);
+            return newFile;
         }
 
         private void AutoClassify(String path)
@@ -151,7 +207,7 @@ namespace 照片分类辅助器
 
                     //当文件存在时,自动在文件名后面加1
                     int StepCount = 1;
-                    while (File.Exists(newFilePath)) 
+                    while (File.Exists(newFilePath))
                     {
                         newFilePath = Path.Combine(path, Path.GetFileNameWithoutExtension(file) + "_" + (++StepCount) + Path.GetExtension(file));
                     }
