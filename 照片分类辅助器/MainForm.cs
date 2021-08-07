@@ -173,7 +173,7 @@ namespace 照片分类辅助器
             //不能小于2010年前的日志,历史太久远,理应不会整理那么老的文件.
             if (dateTimeResult.CompareTo(new DateTime(2010, 1, 1, 0, 0, 0, DateTimeKind.Local)) < 0)
                 return oldFile;
-           
+
             //当原文件名已经包含指定的前缀,为了防止重复.
             if (oldFileName.StartsWith(dateTimeResult.ToString("yyyy-MM-dd")))
                 return oldFile;
@@ -193,11 +193,13 @@ namespace 照片分类辅助器
 
             progressBar1.Maximum = files.Count;
             progressBar1.Value = 0;
+            int unClassifyCount = 0;
             foreach (var file in files)
             {
                 var folderName = SpeculateNewFolderName(file);
                 if (string.IsNullOrEmpty(folderName))
                 {
+                    unClassifyCount++;
                     //将不符合规则的文件,移动到根目录.方便归纳整理.
                     String newFilePath = Path.Combine(path, Path.GetFileName(file));
 
@@ -259,7 +261,7 @@ namespace 照片分类辅助器
                     return 1;
             });
             var allDir = "";
-            int Count = 0;
+            int deletedEmptyFolderCount = 0;
 
             foreach (var dir in folderList)
             {
@@ -270,9 +272,18 @@ namespace 照片分类辅助器
                 if (Directory.GetFiles(dir, "*", SearchOption.AllDirectories).Length > 0)
                     continue;
                 Directory.Delete(dir, false);
-                allDir += ++Count + ". " + dir + "\r\n";
+                allDir += ++deletedEmptyFolderCount + ". " + dir + "\r\n";
             }
-            MessageBox.Show("已删除以下" + Count + "个空文件夹:\r\n\r\n" + allDir);
+            MessageBox.Show("已删除以下" + deletedEmptyFolderCount + "个空文件夹:\r\n\r\n" + allDir);
+
+            label1.Text = string.Format(""
+                + "检测到文件:{0}个              可分类目录:{1}个"
+                + "\n\n"
+                + "未分类文件:{2}个              已删除目录:{3}个"
+                , files.Count
+                , dirs.Count
+                , unClassifyCount
+                , deletedEmptyFolderCount);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)

@@ -41,9 +41,11 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(50, 56);
+            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOK.Location = new System.Drawing.Point(6, 60);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(130, 23);
+            this.btnOK.Size = new System.Drawing.Size(282, 23);
             this.btnOK.TabIndex = 1;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -51,36 +53,42 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.AutoEllipsis = true;
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.label1.Location = new System.Drawing.Point(0, 84);
+            this.label1.Location = new System.Drawing.Point(4, 123);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 12);
+            this.label1.Size = new System.Drawing.Size(284, 42);
             this.label1.TabIndex = 2;
-            this.label1.Text = "label1";
-            this.label1.Visible = false;
+            this.label1.Text = "检测到文件:{0}个              可分类目录:{1}个\r\n\r\n未分类文件:{2}个              已删除目录:{3}个";
             this.label1.TextChanged += new System.EventHandler(this.label1_TextChanged);
             // 
             // cbbNewFolderName
             // 
+            this.cbbNewFolderName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbbNewFolderName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.cbbNewFolderName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cbbNewFolderName.Location = new System.Drawing.Point(6, 12);
             this.cbbNewFolderName.Name = "cbbNewFolderName";
-            this.cbbNewFolderName.Size = new System.Drawing.Size(219, 20);
+            this.cbbNewFolderName.Size = new System.Drawing.Size(282, 20);
             this.cbbNewFolderName.TabIndex = 0;
             // 
             // progressBar1
             // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Location = new System.Drawing.Point(6, 38);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(219, 15);
+            this.progressBar1.Size = new System.Drawing.Size(282, 15);
             this.progressBar1.Step = 1;
             this.progressBar1.TabIndex = 3;
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(169, 101);
+            this.numericUpDown1.Location = new System.Drawing.Point(142, 91);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             1874919424,
             2328306,
@@ -103,7 +111,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(28, 103);
+            this.label2.Location = new System.Drawing.Point(4, 95);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(137, 12);
             this.label2.TabIndex = 6;
@@ -112,7 +120,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(28, 119);
+            this.label3.Location = new System.Drawing.Point(182, 95);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(113, 12);
             this.label3.TabIndex = 6;
@@ -123,7 +131,8 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(230, 140);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(293, 174);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.numericUpDown1);
