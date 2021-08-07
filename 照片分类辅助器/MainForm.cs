@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -33,6 +34,11 @@ namespace 照片分类辅助器
         public MainForm()
         {
             InitializeComponent();
+
+            //将文件属性里的标题作为默认标题显示.方便更新版本号.只需要更新属性AssemblyInfo.cs里的信息即可.
+            var a = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+            System.Reflection.AssemblyTitleAttribute aT = (AssemblyTitleAttribute)a[0];
+            this.Text = aT.Title;
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)

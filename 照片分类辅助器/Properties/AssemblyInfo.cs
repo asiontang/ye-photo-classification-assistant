@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("照片分类辅助器.v210807.02.02.009")]
+[assembly: AssemblyTitle("照片分类辅助器.v210807.03.05.011")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("AsionTang")]
-[assembly: AssemblyProduct("照片分类辅助器.v210807.02.02.009")]
+[assembly: AssemblyProduct("照片分类辅助器")]
 [assembly: AssemblyCopyright("Copyright © AsionTang 2012-2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“内部版本号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.2.9")]
-[assembly: AssemblyFileVersion("2.2.9")]
+[assembly: AssemblyVersion("3.5.11")]
+[assembly: AssemblyFileVersion("3.5.11")]
